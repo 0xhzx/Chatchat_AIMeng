@@ -12,3 +12,8 @@ considering importing/fine-tuning more multimodal solutions to provide the featu
 2. Community Q&A Repositories: Datasets from platforms like Stack Exchange, which provide a wealth of structured Q&A pairs across various domains.
 3. Specialized Knowledge Bases: Subject-specific databases for accurate, domain-specific information.
 4. Duke Lectures’ PPT as domain knowledge.
+
+
+## Model
+
+![alt text](./images/image.png)

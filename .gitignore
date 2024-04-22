@@ -9,6 +9,11 @@ __pycache__/
 */*/chainlit/
 /openai-*
 
+# model
+*/models
+*/models/fine_tuned_t5
+*/models/google
+
 # C extensions
 *.so
 
