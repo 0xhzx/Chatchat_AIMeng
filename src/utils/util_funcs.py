@@ -103,5 +103,5 @@ def generate_response(model, tokenizer, prompt, max_new_tokens=256):
     clear_gpu_memory()
     return response
 
-def consine_similarity(a, b):
+def cosine_similarity(a, b):
     return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))
