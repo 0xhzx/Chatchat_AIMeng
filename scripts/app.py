@@ -4,11 +4,15 @@ from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 import transformers
 import torch
-
 import chainlit as cl
 from chainlit.playground.config import add_llm_provider
 from chainlit.playground.providers.langchain import LangchainGenericProvider
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
+
+hf_token = os.getenv("HF_TOKEN")
 
 template = """
 You are a helpful AI assistant. Provide the answer for the following question:
@@ -23,23 +27,25 @@ Answer:
 @cl.cache
 def load_llama():
     model = "meta-llama/Llama-2-7b-chat-hf"
-    tokenizer = AutoTokenizer.from_pretrained(model)
+    tokenizer = AutoTokenizer.from_pretrained(model, token=hf_token, return_token_type_ids=False)
     streamer = TextStreamer(tokenizer, skip_prompt=True)
     pipeline = transformers.pipeline(
         "text-generation",
         model=model,
         tokenizer=tokenizer,
+        # low_cpu_mem_usage=True,
         torch_dtype=torch.float16,
         trust_remote_code=True,
-        device_map="auto",
+        # device_map="auto",
         max_length=1000,
         do_sample=True,
         top_k=10,
         num_return_sequences=1,
         eos_token_id=tokenizer.eos_token_id,
         streamer=streamer,
-        use_auth_token=True,
+        token=hf_token,
     )
+    # use_auth_token=True,
 
     llm = HuggingFacePipeline(
         pipeline=pipeline,
