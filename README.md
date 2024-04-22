@@ -17,3 +17,5 @@ considering importing/fine-tuning more multimodal solutions to provide the featu
 ## Model
 
 ![alt text](./images/image.png)
+![alt text](./images/image2.png)
+![alt text](image.png)
