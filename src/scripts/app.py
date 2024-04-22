@@ -36,7 +36,7 @@ def load_llama():
         # low_cpu_mem_usage=True,
         torch_dtype=torch.float16,
         trust_remote_code=True,
-        # device_map="auto",
+        device_map="auto",
         max_length=1000,
         do_sample=True,
         top_k=10,
