@@ -15,6 +15,7 @@ import chainlit as cl
 from langchain import PromptTemplate
 from typing import List
 from langchain.docstore.document import Document
+from transformers import AutoTokenizer, GenerationConfig
 
 try:
     from modules.constants import *
@@ -66,3 +67,24 @@ def clear_gpu_memory():
     # Clear PyTorch's CUDA memory cache
     with torch.no_grad():
         torch.cuda.empty_cache()
+
+
+# generate the suitable prompt for the model
+def generate_prompt(question):
+    pre_prompt = "You are a Question-Answering assistant. According to the following question:\n\n"
+    prompt = pre_prompt + question + "\n\nHere are some good answers:\n"
+    return prompt
+
+# generate the response
+def generate_response(model, tokenizer, prompt, max_new_tokens=256):
+    '''
+    The contrastive search decoding strategy was proposed in the 2022 paper A Contrastive Framework for Neural Text Generation.
+    Ref: https://huggingface.co/docs/transformers/v4.40.0/en/generation_strategies
+    '''
+    model.eval()
+    tokenized_prompt = tokenizer(generate_prompt(prompt), return_tensors="pt")["input_ids"].to(DEVICE)
+    model_output = model.generate(tokenized_prompt, penalty_alpha=0.6, top_k=4, generation_config=GenerationConfig(max_new_tokens=max_new_tokens, eos_token_id=model.config.eos_token_id,
+    pad_token=model.config.pad_token_id))[0]
+    response = tokenizer.decode(model_output, skip_special_tokens=True)
+    clear_gpu_memory()
+    return response

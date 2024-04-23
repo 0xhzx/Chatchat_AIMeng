@@ -1,4 +1,6 @@
 import os, sys
+
+import torch
 parentddir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
 sys.path.append(parentddir)
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -49,3 +51,11 @@ LLAMA_PATH = "meta-llama/Llama-2-7b-chat-hf"
 FINETUNE_PATH = "0xhzx/nv-qa"
 PDF_CHAT_PATH = "gpt-3.5-turbo-1106"
 
+## Hyperparameters
+EPOCHS = 5
+LR = 1e-3
+BATCH_SIZE = 4
+SAVE_TOTAL_LIMIT = 2
+EVALUATION_STRATEGY = "epoch"
+# DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
+DEVICE = "cpu"

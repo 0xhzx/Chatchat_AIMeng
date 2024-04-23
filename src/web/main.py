@@ -1,5 +1,6 @@
 import os, sys
 
+
 parentddir = os.path.abspath(os.path.join(os.path.dirname(__file__), os.path.pardir))
 sys.path.append(parentddir)
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -28,21 +29,22 @@ from langchain.chains import ConversationalRetrievalChain
 import pinecone
 from chainlit.types import AskFileResponse
 from langchain.chat_models import ChatOpenAI
+from transformers import T5Tokenizer
+from transformers import AutoModelForSeq2SeqLM
+
 try:
     from modules.chat_agent import ChatAgent
     from modules.constants import *
-    from modules.helpers import get_sources
+    from modules.helpers import get_sources, clear_gpu_memory, generate_response
     from modules.vector_db import VectorDB
     from modules.memory import memory
-    from modules.helpers import clear_gpu_memory
-
 except:
     from web.modules.chat_agent import ChatAgent
     from web.modules.constants import *
-    from web.modules.helpers import get_sources
     from web.modules.vector_db import VectorDB
     from web.modules.memory import memory
-    from web.modules.helpers import clear_gpu_memory
+    from web.modules.helpers import clear_gpu_memory, generate_response, get_sources
+
 
 
 
@@ -53,6 +55,10 @@ except:
 async def chat_profile():
     return [
         cl.ChatProfile(
+            name="PDF Chat",
+            markdown_description="Use OpenAI API for **gpt-3.5-turbo-1106**.",
+        ),
+        cl.ChatProfile(
             name="LLama",
             markdown_description="Use the local LLM: **LLama-7b-chat-hf*.",
         ),
@@ -60,10 +66,7 @@ async def chat_profile():
             name="Fintuned-flan-flan-t5-base",
             markdown_description="Use for Nvidia QA",
         ),
-        cl.ChatProfile(
-            name="PDF Chat",
-            markdown_description="Use OpenAI API for **gpt-3.5-turbo-1106**.",
-        ),
+        
     ]
 
 
@@ -123,23 +126,31 @@ async def start():
             if chat_profile.lower() == "llama":
                 config["llm_params"]["model"] = LLAMA_PATH
                 config["llm_params"]["model_type"] = "llama"
+                # create chat agent
+                chat_agent = ChatAgent(config)
+                chain = chat_agent.qa_bot()
+                model = config["llm_params"]["model"]
+                msg = cl.Message(content=f"Starting the bot {model}...")
+                await msg.send()
+                msg.content = f"Hey, please feel free to ask me some questions!"
+                await msg.update()
+
+                cl.user_session.set("chain", chain)
+                clear_gpu_memory()
+
             elif chat_profile.lower() == "fintuned-flan-flan-t5-base":
                 config["llm_params"]["llm_loader"] = "fintuned-flan-flan-t5-base"
                 config["llm_params"]["model"] = FINETUNE_PATH
                 config["llm_params"]["model_type"] = "flan-t5"
-            else:
-                pass
+                # use simple Text generation model
+                finetuned_model = AutoModelForSeq2SeqLM.from_pretrained(FINETUNE_PATH)
+                tokenizer = T5Tokenizer.from_pretrained("google/flan-t5-base")
+                cl.user_session.set("finetuned_model", finetuned_model)
+                cl.user_session.set("tokenizer", tokenizer)
+                msg = cl.Message(content=f"Starting the bot {FINETUNE_PATH}...")
+                msg.content = f"Hey, please feel free to ask me some questions about Nvidia!"
+                await msg.update()
 
-            chat_agent = ChatAgent(config)
-            chain = chat_agent.qa_bot()
-            model = config["llm_params"]["model"]
-            msg = cl.Message(content=f"Starting the bot {model}...")
-            await msg.send()
-            msg.content = f"Hey, please feel free to ask me some questions!"
-            await msg.update()
-
-            cl.user_session.set("chain", chain)
-            clear_gpu_memory()
     else:
         print("chat_profile is None")
         return None
@@ -153,31 +164,37 @@ def rename(orig_author: str):
 @cl.on_message
 async def main(message):
     clear_gpu_memory()
-
-    chain = cl.user_session.get("chain")
-    is_pdf_task = cl.user_session.get("pdf")
-    # res = await chain.acall(message.content)
-    cb = cl.AsyncLangchainCallbackHandler()
-    res = await chain.acall(message.content, callbacks=[cb])
-    print(f"response: {res}")
-    try:
-        answer = res["answer"]
-    except:
-        answer = res["result"]
-    print(f"answer: {answer}")
-
-    answer_with_sources, source_elements = get_sources(res, answer)
-    if is_pdf_task != "PDF":
-        match = re.search(r'Helpful answer:(.*)', answer_with_sources, re.DOTALL)
-        if match:
-            final_answer = match.group(1).strip()
-        else:
-            final_answer = "No match found"
+    if cl.user_session.get("finetuned_model") is not None and cl.user_session.get("tokenizer") is not None:
+        finetuned_model = cl.user_session.get("finetuned_model")
+        tokenizer = cl.user_session.get("tokenizer")
+        response = generate_response(finetuned_model, tokenizer, prompt=message.content)
+        clear_gpu_memory()
+        await cl.Message(content=response).send()
     else:
-        final_answer = answer_with_sources
-    
-    print(final_answer)
-    del chain
-    clear_gpu_memory()
+        chain = cl.user_session.get("chain")
+        is_pdf_task = cl.user_session.get("pdf")
+        # res = await chain.acall(message.content)
+        cb = cl.AsyncLangchainCallbackHandler()
+        res = await chain.acall(message.content, callbacks=[cb])
+        print(f"response: {res}")
+        try:
+            answer = res["answer"]
+        except:
+            answer = res["result"]
+        print(f"answer: {answer}")
 
-    await cl.Message(content=final_answer, elements=source_elements).send()
+        answer_with_sources, source_elements = get_sources(res, answer)
+        if is_pdf_task != "PDF":
+            match = re.search(r'Helpful answer:(.*)', answer_with_sources, re.DOTALL)
+            if match:
+                final_answer = match.group(1).strip()
+            else:
+                final_answer = "No match found"
+        else:
+            final_answer = answer_with_sources
+        
+
+        print(final_answer)
+        del chain
+        clear_gpu_memory()
+        await cl.Message(content=final_answer, elements=source_elements).send()
