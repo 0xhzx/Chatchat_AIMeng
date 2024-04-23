@@ -166,6 +166,7 @@ async def main(message):
     clear_gpu_memory()
     if cl.user_session.get("finetuned_model") is not None and cl.user_session.get("tokenizer") is not None:
         finetuned_model = cl.user_session.get("finetuned_model")
+        finetuned_model.eval()
         tokenizer = cl.user_session.get("tokenizer")
         response = generate_response(finetuned_model, tokenizer, prompt=message.content)
         clear_gpu_memory()

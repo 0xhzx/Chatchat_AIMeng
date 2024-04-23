@@ -10,6 +10,11 @@ from chainlit.playground.providers.langchain import LangchainGenericProvider
 from dotenv import load_dotenv
 import os
 
+'''
+This is an example from chainlit's cookbook. It demonstrates how to create a local LLM chain using the Llama-2-7b model.
+'''
+
+
 load_dotenv()
 
 hf_token = os.getenv("HF_TOKEN")

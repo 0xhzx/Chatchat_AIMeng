@@ -29,7 +29,7 @@ welcome_message = """Welcome to the Chainlit PDF QA demo! To get started:
 2. Ask a question about the file
 """
 
-
+# process pdf and txt files
 def process_file(file: AskFileResponse):
     if file.type == "text/plain":
         Loader = TextLoader
@@ -44,6 +44,7 @@ def process_file(file: AskFileResponse):
     return docs
 
 
+# create a pinecone index for the file
 def get_docsearch(file: AskFileResponse):
     docs = process_file(file)
 
@@ -66,6 +67,7 @@ def get_docsearch(file: AskFileResponse):
     return docsearch
 
 
+# chainlit code starts chat initialization
 @cl.on_chat_start
 async def start():
     await cl.Avatar(
@@ -91,13 +93,14 @@ async def start():
 
     message_history = ChatMessageHistory()
 
+    # create a memory object
     memory = ConversationBufferMemory(
         memory_key="chat_history",
         output_key="answer",
         chat_memory=message_history,
         return_messages=True,
     )
-
+    # create a conversational retrieval chain
     chain = ConversationalRetrievalChain.from_llm(
         ChatOpenAI(model_name="gpt-3.5-turbo", temperature=0, streaming=True),
         chain_type="stuff",
@@ -112,7 +115,7 @@ async def start():
 
     cl.user_session.set("chain", chain)
 
-
+# async main function for listening to messages
 @cl.on_message
 async def main(message: cl.Message):
     chain = cl.user_session.get("chain")  # type: ConversationalRetrievalChain
