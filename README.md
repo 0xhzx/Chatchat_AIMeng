@@ -19,3 +19,6 @@ considering importing/fine-tuning more multimodal solutions to provide the featu
 ![alt text](./images/image.png)
 ![alt text](./images/image2.png)
 ![alt text](image.png)
+
+## Web
+![alt text](image-1.png)

@@ -36,12 +36,12 @@ def process_file(file: AskFileResponse):
     elif file.type == "application/pdf":
         Loader = PyPDFLoader
 
-        loader = Loader(file.path)
-        documents = loader.load()
-        docs = text_splitter.split_documents(documents)
-        for i, doc in enumerate(docs):
-            doc.metadata["source"] = f"source_{i}"
-        return docs
+    loader = Loader(file.path)
+    documents = loader.load()
+    docs = text_splitter.split_documents(documents)
+    for i, doc in enumerate(docs):
+        doc.metadata["source"] = f"source_{i}"
+    return docs
 
 
 def get_docsearch(file: AskFileResponse):
