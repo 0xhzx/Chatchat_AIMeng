@@ -1,0 +1,8 @@
+llm_params: 
+  use_history: False # bool
+  memory_window: 3 # int
+  model: "meta-llama/Llama-2-7b-chat-hf"
+  model_type: "llama"
+  temperature: 0.2
+embedding_options:
+  index_name: "chatchat"
