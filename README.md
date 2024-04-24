@@ -47,10 +47,10 @@ Here, I compared with n-gram. The main idea of generating text using N-Grams is 
 
 However, compared with polular LLM, this kind of solution is much worse. The Non-DL approach usually cannot match the performance and flexibility of deep learning methods when dealing with complex language modeling tasks. 
 
-## Interesting finding
+## Interesting findings
 There are almost no LLM App that can offer the different workflow and model selection(esprcially for opern-source LLM) as the user want. I aasumed that it is because differnet model has their own interface and loading logic. That is why,in this project, I tried my best to implement an unified adaption for different LLMs for user to choose. 
 
-There is a problem that when the user call 
+There is a problem that when the user is invoking local LLM inference, if they switch to another interface process but do not terminate the current local llm task, the gpu memory will continuously increasing. It can not be solved unless you terminate the process. Nevertheless, when you are in a Jupyter Notebook environmrnt, `torch.empty_cache()` function can also work well.
 ![alt text](./images/image2.png)
 
 ## Web
