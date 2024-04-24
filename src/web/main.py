@@ -85,7 +85,7 @@ async def start():
             config["llm_params"]["model"] = PDF_CHAT_PATH
             config["llm_params"]["model_type"] = "pdf_chat"
             await cl.Avatar(
-                name="Chatbot",
+                name="Chatchat",
                 url='https://upload.wikimedia.org/wikipedia/commons/e/e6/Duke_University_logo.svg',
             ).send()
             files = None
