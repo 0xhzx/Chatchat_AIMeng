@@ -58,10 +58,10 @@ async def chat_profile():
             name="PDF Chat",
             markdown_description="Use OpenAI API for **gpt-3.5-turbo-1106**.",
         ),
-        cl.ChatProfile(
-            name="LLama",
-            markdown_description="Use the local LLM: **LLama-7b-chat-hf*.",
-        ),
+        # cl.ChatProfile(
+        #     name="LLama",
+        #     markdown_description="Use the local LLM: **LLama-7b-chat-hf**.",
+        # ),
         cl.ChatProfile(
             name="Fintuned-flan-flan-t5-base",
             markdown_description="Use for Nvidia QA",

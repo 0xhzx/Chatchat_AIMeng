@@ -1,6 +1,7 @@
 # Chatchat
 ## Problem Statement
 In the era of information overload, where accessing specific and accurate answers to complex questions is both challenging and time-consuming, there is a growing need for advanced solutions. To address this, I propose the development of a cloud-based Question and Answer (Q&A) system, which is a multifunctional integrated LLM application that offer different solutions for different tasks.
+
 ## Previous Efforts
 [Ollama](https://ollama.com/), a useful tool for getting up and running with large language models locally. It is easy for integrating diffrent LLM locally, but is does not offer the solution combination of different tasks. Developing LLM application also always encounter difficult problems. e.g. 
 - Cost 
@@ -16,6 +17,17 @@ Therefore, I tried to build a application that unified different workflow best p
 1. Local knowledge base + GPT-3.5 -- Solving the hallucination and data inaccurate.
 2. Local LLM baseline(LLama2-7b-chat) -- Solving the privacy problem
 3. Fintuned flan-t5 model -- Fintuned on specific QA dataset(Nvidia QA). Solving the cost problem, because it is light.
+
+## Prepare
+### Environment Requirements
+- Python 3.10+
+- Required dependencies (see requirements.txt)
+
+### Installation Steps
+After you fork and git clone the project, You should do the following steps:
+1. Prepare for the virtual environment `python -m venv venv`
+2. Activate virtual environment.<br/> Windows:`venv\Scripts\activate`, MacOS or Linux:`source venv/bin/activate`
+3. Install required packages `pip install -r requirements.txt`
 
 ## Data Sources
 The dataset I used for fintuning model is [nvidia-qa](https://huggingface.co/datasets/ajsbsd/nvidia-qa) It is nvidia documentation question and answer pairs Q&A dataset for LLM finetuning about the NVIDIA about SDKs and blogs. 
@@ -63,3 +75,5 @@ cd src
 chainlit run web/main.py -w
 ```
 ![alt text](./images/image-1.png)
+
+**Due to the high cost of the local LLM(because it should run on a powerful GPU), in my online web demo I cancelled this feature. If you want to try, please let me know and I will keep it open for a shorter time. Thank you!**
