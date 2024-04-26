@@ -75,7 +75,9 @@ async def chat_profile():
 @cl.on_chat_start
 async def start():
     clear_gpu_memory()
-    with open("web/config.yml", "r") as f:
+    # with open("web/config.yml", "r") as f:
+    # docker requirement
+    with open("config.yml", "r") as f:
         config = yaml.safe_load(f)
         print(config)
     chat_profile = cl.user_session.get("chat_profile")

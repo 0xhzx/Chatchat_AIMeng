@@ -77,3 +77,7 @@ chainlit run web/main.py -w
 ![alt text](./images/image-1.png)
 
 **Due to the high cost of the local LLM(because it should run on a powerful GPU), in my online web demo I cancelled this feature. If you want to try, please let me know and I will keep it open for a shorter time. Thank you!**
+
+### Deployment
+Deployed on AWS by ECS and ECR. The endpoint is: http://44.211.116.41:8080/
+![alt text](./images/image-6.png)
